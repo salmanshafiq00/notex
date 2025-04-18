@@ -546,3 +546,73 @@ body.font-large .modal-content {
 .fa-file-pdf {
   color: #d93025;
 }
+
+/* Category Stats */
+.category-stats {
+  padding: 16px;
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.category-counts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.category-count-item {
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  color: white;
+}
+
+.category-count-item:hover {
+  transform: translateY(-2px);
+}
+
+.category-count-item h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.category-count-item .count {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+/* Category colors */
+.category-Work { background: linear-gradient(135deg, #FF6B6B, #FF8E8E); }
+.category-Personal { background: linear-gradient(135deg, #4ECDC4, #45B7AF); }
+.category-Research { background: linear-gradient(135deg, #96C93D, #7EAF32); }
+.category-Ideas { background: linear-gradient(135deg, #A18CD1, #8675A9); }
+
+.recent-items-section {
+  margin-top: 24px;
+}
+
+.recent-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-item {
+  padding: 8px;
+  border-radius: 6px;
+  background: var(--secondary-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recent-item:hover {
+  background: var(--hover-color);
+}

@@ -54,7 +54,15 @@ chrome.commands.onCommand.addListener((command) => {
   if (command === "clip-selection") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "clipSelection" });
+        chrome.tabs.sendMessage(tabs[0].id, { action: "clipSelection" }, (response) => {
+          if (response && response.data) {
+            // Store the selection data temporarily
+            chrome.storage.local.set({ "tempSelection": response.data }, () => {
+              // Open the popup
+              chrome.action.openPopup();
+            });
+          }
+        });
       }
     });
   }

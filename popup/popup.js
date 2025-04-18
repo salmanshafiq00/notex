@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const exportAllBtn = document.getElementById('export-all-btn');
   const importBtn = document.getElementById('import-btn');
   const fileInput = document.getElementById('file-input');
+  const categoryCounts = document.getElementById('category-counts');
+  const recentItemsContainer = document.getElementById('recent-items');
   
   // State variables
   let currentSelection = null;
@@ -582,9 +584,69 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFontSize(settings.fontSize);
   }
   
+  // Show category stats
+  function showCategoryStats() {
+    getStorage().get(['savedItems'], (result) => {
+      const items = result.savedItems || [];
+      const categoryStats = {};
+      
+      // Calculate counts
+      categories.forEach(category => {
+        categoryStats[category] = items.filter(item => item.category === category).length;
+      });
+      
+      // Render category counts
+      categoryCounts.innerHTML = '';
+      
+      categories.forEach(category => {
+        const div = document.createElement('div');
+        div.className = `category-count-item category-${category}`;
+        div.innerHTML = `
+          <h3>${category}</h3>
+          <div class="count">${categoryStats[category]}</div>
+        `;
+        div.addEventListener('click', () => {
+          showCategoryItems(category);
+        });
+        categoryCounts.appendChild(div);
+      });
+      
+      // Show recent items (last 5)
+      const recentItems = items
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
+        
+      recentItemsContainer.innerHTML = '';
+      
+      recentItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'recent-item';
+        div.innerHTML = `
+          <div class="recent-item-title">${item.title}</div>
+          <div class="recent-item-meta">
+            <span class="category-tag category-${item.category}">${item.category}</span>
+            <span class="date">${formatDate(item.timestamp)}</span>
+          </div>
+        `;
+        div.addEventListener('click', () => {
+          showItemDetails(item);
+        });
+        recentItemsContainer.appendChild(div);
+      });
+    });
+  }
+  
+  // Show category items
+  function showCategoryItems(category) {
+    form.classList.add('hidden');
+    savedContent.classList.remove('hidden');
+    filterCategory.value = category;
+    loadSavedItems();
+  }
+  
   // Initialize
   initSettings();
-  loadSelectedContent();
+  showCategoryStats();
   
   // Event Listeners
   saveBtn.addEventListener('click', saveCurrentSelection);
@@ -705,6 +767,15 @@ document.addEventListener('DOMContentLoaded', () => {
       importItems(e.target.files[0]);
       // Reset file input
       e.target.value = '';
+    }
+  });
+  
+  // Check for temp selection
+  getStorage().get(['tempSelection'], (result) => {
+    if (result.tempSelection) {
+      form.classList.remove('hidden');
+      savedContent.classList.add('hidden');
+      loadSelectedContent();
     }
   });
 });
