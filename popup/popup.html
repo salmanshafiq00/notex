@@ -42,7 +42,7 @@
               div.innerHTML = `
                 <div class="recent-item-title">${item.title}</div>
                 <div class="recent-item-meta">
-                  <span class="category-badge category-badge-${item.category}">${item.category}</span>
+                  <span class="category-badge category-badge-${item.category.toLowerCase()}">${item.category}</span>
                   <span class="date">${formatDate(item.timestamp)}</span>
                 </div>
                 <div class="recent-item-preview">${item.text.substring(0, 120)}${item.text.length > 120 ? '...' : ''}</div>

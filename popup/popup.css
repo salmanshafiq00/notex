@@ -309,33 +309,34 @@ button:hover {
   margin-left: 8px;
 }
 
-/* Category Badge Colors */
+/* Enhanced Category Badge Colors */
 .category-badge {
   padding: 3px 8px;
-  border-radius: 12px;
+  border-radius: 4px;
   font-size: 11px;
   font-weight: 500;
   color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.category-badge-General {
-  background: var(--category-general);
+.category-badge-general {
+  background: #757F9A;
 }
 
-.category-badge-Work {
-  background: var(--category-work);
+.category-badge-work {
+  background: #FF6B6B;
 }
 
-.category-badge-Personal {
-  background: var(--category-personal);
+.category-badge-personal {
+  background: #4ECDC4;
 }
 
-.category-badge-Research {
-  background: var(--category-research);
+.category-badge-research {
+  background: #96C93D;
 }
 
-.category-badge-Ideas {
-  background: var(--category-ideas);
+.category-badge-ideas {
+  background: #A18CD1;
 }
 
 .saved-item-preview {
@@ -687,35 +688,37 @@ body.font-large .modal-content {
   margin-bottom: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  border-left: 4px solid transparent;
 }
 
 .recent-item:nth-child(5n+1) {
-  background: linear-gradient(135deg, #FF6B6B20, #FF8E8E20);
-  border-left: 4px solid #FF6B6B;
+  background: #FF6B6B15;
+  border-left-color: #FF6B6B;
 }
 
 .recent-item:nth-child(5n+2) {
-  background: linear-gradient(135deg, #4ECDC420, #45B7AF20);
-  border-left: 4px solid #4ECDC4;
+  background: #4ECDC415;
+  border-left-color: #4ECDC4;
 }
 
 .recent-item:nth-child(5n+3) {
-  background: linear-gradient(135deg, #96C93D20, #7EAF3220);
-  border-left: 4px solid #96C93D;
+  background: #96C93D15;
+  border-left-color: #96C93D;
 }
 
 .recent-item:nth-child(5n+4) {
-  background: linear-gradient(135deg, #A18CD120, #8675A920);
-  border-left: 4px solid #A18CD1;
+  background: #A18CD115;
+  border-left-color: #A18CD1;
 }
 
 .recent-item:nth-child(5n+5) {
-  background: linear-gradient(135deg, #757F9A20, #D7DDE820);
-  border-left: 4px solid #757F9A;
+  background: #757F9A15;
+  border-left-color: #757F9A;
 }
 
 .recent-item:hover {
   transform: translateX(4px);
+  background: var(--hover-color);
 }
 
 .recent-item-title {
@@ -742,8 +745,5 @@ body.font-large .modal-content {
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.4;
-}
-
-.recent-item:hover {
-  background: var(--hover-color);
+  margin-top: 8px;
 }
