@@ -35,6 +35,21 @@
         <h2>Recent Items</h2>
         <div id="recent-items" class="recent-items">
           <!-- Recent items will be inserted here -->
+          <script>
+            function renderRecentItem(item) {
+              const div = document.createElement('div');
+              div.className = 'recent-item';
+              div.innerHTML = `
+                <div class="recent-item-title">${item.title}</div>
+                <div class="recent-item-meta">
+                  <span class="category-badge category-badge-${item.category}">${item.category}</span>
+                  <span class="date">${formatDate(item.timestamp)}</span>
+                </div>
+                <div class="recent-item-preview">${item.text.substring(0, 120)}${item.text.length > 120 ? '...' : ''}</div>
+              `;
+              return div;
+            }
+          </script>
         </div>
       </div>
 
@@ -240,8 +255,8 @@
     </div>
   </div>
   
+  <script src="../lib/html2canvas.min.js"></script>
   <script src="../lib/jspdf.umd.min.js"></script>
-  <!-- <script src="../lib/html2canvas.min.js"></script> -->
   <script src="popup.js"></script>
 </body>
 </html>
