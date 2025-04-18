@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Content Clipper</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Content Clipper</h1>
+      <div class="settings-icon">
+        <i class="fas fa-cog" id="settings-btn" title="Settings"></i>
+      </div>
+    </div>
+    
+    <div class="form">
+      <div class="input-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" placeholder="Add a title for this content" autofocus>
+      </div>
+      
+      <div class="input-group">
+        <label for="category">Category</label>
+        <div class="category-container">
+          <select id="category">
+            <option value="">-- Select a category --</option>
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Research">Research</option>
+            <option value="Ideas">Ideas</option>
+          </select>
+          <button id="add-category-btn" title="Add new category">+</button>
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label for="tags">Tags (comma separated)</label>
+        <input type="text" id="tags" placeholder="e.g., important, follow-up, read-later">
+      </div>
+      
+      <div class="preview-container">
+        <div class="preview-header">
+          <label>Content Preview</label>
+          <div class="preview-controls">
+            <i class="fas fa-expand" id="expand-preview" title="Expand preview"></i>
+            <i class="fas fa-file-pdf" id="export-pdf" title="Export as PDF"></i>
+          </div>
+        </div>
+        <div id="content-preview" class="content-preview"></div>
+      </div>
+      
+      <div class="actions">
+        <button id="save-btn" class="primary-btn">Save</button>
+        <button id="view-saved-btn">View Saved Content</button>
+      </div>
+    </div>
+    
+    <div id="saved-content" class="saved-content hidden">
+      <div class="header">
+        <h2>Saved Content</h2>
+        <div class="saved-controls">
+          <input type="text" id="search-input" placeholder="Search..." class="search-input">
+          <button id="export-all-btn" class="icon-btn" title="Export all items"><i class="fas fa-download"></i></button>
+          <button id="import-btn" class="icon-btn" title="Import items"><i class="fas fa-upload"></i></button>
+          <button id="back-btn" class="text-btn">Back</button>
+        </div>
+      </div>
+      
+      <div class="filters">
+        <div class="filter-item">
+          <label for="filter-category">Filter by:</label>
+          <select id="filter-category">
+            <option value="">All Categories</option>
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Research">Research</option>
+            <option value="Ideas">Ideas</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="saved-items" class="saved-items">
+        <!-- Saved items will be inserted here -->
+      </div>
+    </div>
+    
+    <div id="settings-panel" class="settings-panel hidden">
+      <div class="header">
+        <h2>Settings</h2>
+        <button id="settings-back-btn" class="text-btn">Back</button>
+      </div>
+      
+      <div class="settings-section">
+        <h3>Storage</h3>
+        <div class="setting-item">
+          <label for="sync-storage">
+            <input type="checkbox" id="sync-storage">
+            Sync content across devices
+          </label>
+          <p class="setting-description">May have storage limitations (~100KB)</p>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h3>Appearance</h3>
+        <div class="setting-item">
+          <label for="theme-selector">Theme</label>
+          <select id="theme-selector">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="system">System Default</option>
+          </select>
+        </div>
+        
+        <div class="setting-item">
+          <label for="font-size">Content Font Size</label>
+          <select id="font-size">
+            <option value="small">Small</option>
+            <option value="medium" selected>Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="settings-section">
+        <h3>Categories</h3>
+        <div id="category-list" class="category-list">
+          <!-- Categories will be listed here -->
+        </div>
+        <div class="add-category">
+          <input type="text" id="new-category-input" placeholder="New category name">
+          <button id="save-category-btn">Add</button>
+        </div>
+      </div>
+      
+      <div class="settings-actions">
+        <button id="save-settings-btn" class="primary-btn">Save Settings</button>
+      </div>
+    </div>
+    
+    <!-- Hidden file input for import -->
+    <input type="file" id="file-input" accept=".json" style="display: none;">
+  </div>
+  
+  <!-- Full screen preview modal -->
+  <div id="fullscreen-modal" class="fullscreen-modal hidden">
+    <div class="modal-header">
+      <h3 id="modal-title"></h3>
+      <div class="modal-controls">
+        <i class="fas fa-search-plus" id="zoom-in-btn" title="Zoom in"></i>
+        <i class="fas fa-search-minus" id="zoom-out-btn" title="Zoom out"></i>
+        <i class="fas fa-times" id="close-modal-btn" title="Close"></i>
+      </div>
+    </div>
+    <div id="modal-content" class="modal-content"></div>
+    <div class="modal-footer">
+      <div class="modal-metadata">
+        <span id="modal-category"></span>
+        <span id="modal-date"></span>
+      </div>
+      <button id="modal-pdf-btn" class="primary-btn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+    </div>
+  </div>
+  
+  <!-- Category creation modal -->
+  <div id="category-modal" class="simple-modal hidden">
+    <div class="simple-modal-content">
+      <h3>Add New Category</h3>
+      <input type="text" id="category-modal-input" placeholder="Category name">
+      <div class="modal-actions">
+        <button id="cancel-category-btn" class="secondary-btn">Cancel</button>
+        <button id="confirm-category-btn" class="primary-btn">Add</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
