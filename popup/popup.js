@@ -5,11 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const tagsInput = document.getElementById('tags');
   const contentPreview = document.getElementById('content-preview');
   const saveBtn = document.getElementById('save-btn');
-  const viewSavedBtn = document.getElementById('view-saved-btn');
+  const cancelBtn = document.getElementById('cancel-btn');
   const backBtn = document.getElementById('back-btn');
   const savedContent = document.getElementById('saved-content');
   const savedItems = document.getElementById('saved-items');
-  const form = document.querySelector('.form');
+  const formView = document.getElementById('form-view');
+  const dashboardView = document.getElementById('dashboard-view');
   const searchInput = document.getElementById('search-input');
   const filterCategory = document.getElementById('filter-category');
   const expandPreviewBtn = document.getElementById('expand-preview');
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const zoomInBtn = document.getElementById('zoom-in-btn');
   const zoomOutBtn = document.getElementById('zoom-out-btn');
   const settingsBtn = document.getElementById('settings-btn');
+  const settingsBtnForm = document.getElementById('settings-btn-form');
   const settingsPanel = document.getElementById('settings-panel');
   const settingsBackBtn = document.getElementById('settings-back-btn');
   const saveSettingsBtn = document.getElementById('save-settings-btn');
@@ -34,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const newCategoryInput = document.getElementById('new-category-input');
   const saveCategoryBtn = document.getElementById('save-category-btn');
   const addCategoryBtn = document.getElementById('add-category-btn');
+  const addCategoryBtnSmall = document.getElementById('add-category-btn-small');
   const categoryModal = document.getElementById('category-modal');
   const categoryModalInput = document.getElementById('category-modal-input');
   const confirmCategoryBtn = document.getElementById('confirm-category-btn');
@@ -43,13 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const fileInput = document.getElementById('file-input');
   const categoryCounts = document.getElementById('category-counts');
   const recentItemsContainer = document.getElementById('recent-items');
+  const newClipBtn = document.getElementById('new-clip-btn');
+  const viewAllBtn = document.getElementById('view-all-btn');
+  const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
+  const newClipFloatingBtn = document.getElementById('new-clip-floating-btn');
   
   // State variables
   let currentSelection = null;
   let currentZoom = 1;
   let currentItem = null;
   let isStorageSync = false;
-  let categories = ['Work', 'Personal', 'Research', 'Ideas'];
+  let categories = ['General', 'Work', 'Personal', 'Research', 'Ideas'];
   let defaultSettings = {
     syncStorage: false,
     theme: 'light',
@@ -110,14 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Update category selects
   function updateCategorySelects() {
-    // Clear existing options except default
-    while (categorySelect.options.length > 1) {
-      categorySelect.remove(1);
-    }
-    
-    while (filterCategory.options.length > 1) {
-      filterCategory.remove(1);
-    }
+    // Clear existing options
+    categorySelect.innerHTML = '';
+    filterCategory.innerHTML = '<option value="">All Categories</option>';
     
     // Add categories
     categories.forEach(category => {
@@ -159,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Remove a category
   function removeCategory(category) {
     // Don't remove if it's one of the default categories
-    if (['Work', 'Personal', 'Research', 'Ideas'].includes(category) && categories.length <= 4) {
+    if (['General', 'Work', 'Personal', 'Research', 'Ideas'].includes(category) && categories.length <= 5) {
       alert("Cannot remove default categories. You must have at least one category.");
       return;
     }
@@ -195,7 +197,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSelection = result.tempSelection;
         contentPreview.innerHTML = result.tempSelection.html;
         
-        // Focus on title input as requested
+        // Enable save button
+        saveBtn.disabled = false;
+        
+        // Focus on title input
         setTimeout(() => {
           titleInput.focus();
         }, 100);
@@ -220,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const newItem = {
       id: Date.now(),
       title: titleInput.value || 'Untitled',
-      category: categorySelect.value || 'Uncategorized',
+      category: categorySelect.value || 'General',
       tags: tagsList,
       html: currentSelection.html,
       text: currentSelection.text,
@@ -240,11 +245,14 @@ document.addEventListener('DOMContentLoaded', () => {
           saveBtn.textContent = 'Save';
           // Clear form
           titleInput.value = '';
-          categorySelect.value = '';
+          categorySelect.value = 'General';
           tagsInput.value = '';
           contentPreview.innerHTML = '<i>Content saved. Select more text to clip.</i>';
           currentSelection = null;
           saveBtn.disabled = true;
+          
+          // Go back to dashboard
+          showDashboard();
         }, 1500);
       });
     });
@@ -292,10 +300,13 @@ document.addEventListener('DOMContentLoaded', () => {
           ? `<div class="saved-item-tags">${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>` 
           : '';
         
+        // Add category badge
+        const categoryBadge = `<span class="category-badge category-badge-${item.category}">${item.category}</span>`;
+        
         itemElement.innerHTML = `
           <div class="saved-item-title">
             ${item.title}
-            ${item.category ? `<span class="saved-item-category">${item.category}</span>` : ''}
+            ${categoryBadge}
           </div>
           <div class="saved-item-preview">${item.text.substring(0, 100)}${item.text.length > 100 ? '...' : ''}</div>
           ${tagsHtml}
@@ -343,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     modalTitle.textContent = item.title;
     modalContent.innerHTML = item.html;
-    modalCategory.textContent = item.category || 'Uncategorized';
+    modalCategory.textContent = item.category || 'General';
     modalDate.textContent = formatDate(item.timestamp);
     
     fullscreenModal.classList.remove('hidden');
@@ -437,6 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       getStorage().set({ 'savedItems': items }, () => {
         loadSavedItems();
+        showCategoryStats(); // Update dashboard stats
       });
     });
   }
@@ -495,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
           getStorage().set({ 'savedItems': mergedItems }, () => {
             alert(`Successfully imported ${newItems.length} items.`);
             loadSavedItems();
+            showCategoryStats(); // Update dashboard stats
           });
         });
       } catch (error) {
@@ -528,6 +541,9 @@ document.addEventListener('DOMContentLoaded', () => {
       settings.categories = categories;
       getStorage().set({ 'settings': settings });
     });
+    
+    // Update dashboard
+    showCategoryStats();
   }
   
   // Save settings
@@ -548,6 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply settings immediately
         applySettings(newSettings);
         alert('Settings saved!');
+        settingsPanel.classList.add('hidden');
       }
     });
   }
@@ -571,6 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const settings = result.settings;
             applySettings(settings);
             alert('Settings saved and data migrated!');
+            settingsPanel.classList.add('hidden');
           });
         });
       });
@@ -584,15 +602,49 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFontSize(settings.fontSize);
   }
   
+  // Show dashboard view
+  function showDashboard() {
+    formView.classList.add('hidden');
+    savedContent.classList.add('hidden');
+    dashboardView.classList.remove('hidden');
+    showCategoryStats();
+  }
+  
+  // Show form view
+  function showForm() {
+    dashboardView.classList.add('hidden');
+    savedContent.classList.add('hidden');
+    formView.classList.remove('hidden');
+    loadSelectedContent();
+  }
+  
+  // Show saved content view
+  function showSavedContent() {
+    dashboardView.classList.add('hidden');
+    formView.classList.add('hidden');
+    savedContent.classList.remove('hidden');
+    loadSavedItems();
+  }
+  
   // Show category stats
   function showCategoryStats() {
     getStorage().get(['savedItems'], (result) => {
       const items = result.savedItems || [];
       const categoryStats = {};
       
-      // Calculate counts
+      // Calculate counts, default to 0 for all categories
       categories.forEach(category => {
-        categoryStats[category] = items.filter(item => item.category === category).length;
+        categoryStats[category] = 0;
+      });
+      
+      // Count items by category
+      items.forEach(item => {
+        const category = item.category || 'General';
+        if (categoryStats[category] !== undefined) {
+          categoryStats[category]++;
+        } else {
+          categoryStats[category] = 1;
+        }
       });
       
       // Render category counts
@@ -603,7 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
         div.className = `category-count-item category-${category}`;
         div.innerHTML = `
           <h3>${category}</h3>
-          <div class="count">${categoryStats[category]}</div>
+          <div class="count">${categoryStats[category] || 0}</div>
         `;
         div.addEventListener('click', () => {
           showCategoryItems(category);
@@ -618,13 +670,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
       recentItemsContainer.innerHTML = '';
       
+      if (recentItems.length === 0) {
+        recentItemsContainer.innerHTML = '<div class="no-items">No items yet. Click "New Clip" to create one.</div>';
+        return;
+      }
+      
       recentItems.forEach(item => {
         const div = document.createElement('div');
         div.className = 'recent-item';
         div.innerHTML = `
           <div class="recent-item-title">${item.title}</div>
           <div class="recent-item-meta">
-            <span class="category-tag category-${item.category}">${item.category}</span>
+            <span class="category-badge category-badge-${item.category}">${item.category}</span>
             <span class="date">${formatDate(item.timestamp)}</span>
           </div>
         `;
@@ -638,44 +695,59 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Show category items
   function showCategoryItems(category) {
-    form.classList.add('hidden');
-    savedContent.classList.remove('hidden');
+    showSavedContent();
     filterCategory.value = category;
     loadSavedItems();
   }
   
+  // Register keyboard shortcut for content selection
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "keyboardShortcut") {
+      // If shortcut triggered, show form view
+      showForm();
+    }
+  });
+  
   // Initialize
   initSettings();
-  showCategoryStats();
+  
+  // Check if we should show the form view first (if we have temp selection)
+  getStorage().get(['tempSelection'], (result) => {
+    if (result.tempSelection) {
+      showForm();
+    } else {
+      // Always show dashboard view initially
+      showDashboard();
+    }
+  });
   
   // Event Listeners
   saveBtn.addEventListener('click', saveCurrentSelection);
   
-  viewSavedBtn.addEventListener('click', () => {
-    form.classList.add('hidden');
-    savedContent.classList.remove('hidden');
-    loadSavedItems();
+  cancelBtn.addEventListener('click', () => {
+    showDashboard();
   });
   
-  backBtn.addEventListener('click', () => {
-    savedContent.classList.add('hidden');
-    form.classList.remove('hidden');
-  });
+  backBtn.addEventListener('click', showDashboard);
   
-  searchInput.addEventListener('input', () => {
-    loadSavedItems();
-  });
+  newClipBtn.addEventListener('click', showForm);
   
-  filterCategory.addEventListener('change', () => {
-    loadSavedItems();
-  });
+  newClipFloatingBtn.addEventListener('click', showForm);
+  
+  viewAllBtn.addEventListener('click', showSavedContent);
+  
+  backToDashboardBtn.addEventListener('click', showDashboard);
+  
+  searchInput.addEventListener('input', loadSavedItems);
+  
+  filterCategory.addEventListener('change', loadSavedItems);
   
   expandPreviewBtn.addEventListener('click', () => {
     if (currentSelection) {
       showItemDetails({
         id: 'preview',
         title: titleInput.value || 'Preview',
-        category: categorySelect.value || 'Uncategorized',
+        category: categorySelect.value || 'General',
         html: currentSelection.html,
         text: currentSelection.text,
         timestamp: new Date().toISOString()
@@ -688,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
       generatePdf({
         id: 'preview',
         title: titleInput.value || 'Untitled',
-        category: categorySelect.value || 'Uncategorized',
+        category: categorySelect.value || 'General',
         html: currentSelection.html,
         text: currentSelection.text,
         timestamp: new Date().toISOString(),
@@ -722,6 +794,10 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsPanel.classList.remove('hidden');
   });
   
+  settingsBtnForm.addEventListener('click', () => {
+    settingsPanel.classList.remove('hidden');
+  });
+  
   settingsBackBtn.addEventListener('click', () => {
     settingsPanel.classList.add('hidden');
   });
@@ -737,6 +813,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   addCategoryBtn.addEventListener('click', () => {
+    categoryModal.classList.remove('hidden');
+    setTimeout(() => {
+      categoryModalInput.focus();
+    }, 100);
+  });
+  
+  addCategoryBtnSmall.addEventListener('click', () => {
     categoryModal.classList.remove('hidden');
     setTimeout(() => {
       categoryModalInput.focus();
@@ -770,12 +853,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // Check for temp selection
-  getStorage().get(['tempSelection'], (result) => {
-    if (result.tempSelection) {
-      form.classList.remove('hidden');
-      savedContent.classList.add('hidden');
-      loadSelectedContent();
+  // Close category modal on outside click
+  window.addEventListener('click', (e) => {
+    if (e.target === categoryModal) {
+      categoryModal.classList.add('hidden');
+    }
+  });
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Escape key closes modals
+    if (e.key === 'Escape') {
+      if (!fullscreenModal.classList.contains('hidden')) {
+        fullscreenModal.classList.add('hidden');
+        document.body.style.overflow = '';
+      } else if (!categoryModal.classList.contains('hidden')) {
+        categoryModal.classList.add('hidden');
+      } else if (!settingsPanel.classList.contains('hidden')) {
+        settingsPanel.classList.add('hidden');
+      }
+    }
+    
+    // Ctrl+S saves the current selection
+    if (e.ctrlKey && e.key === 's' && !formView.classList.contains('hidden') && !saveBtn.disabled) {
+      e.preventDefault();
+      saveCurrentSelection();
     }
   });
 });

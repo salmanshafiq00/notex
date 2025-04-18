@@ -7,12 +7,18 @@ chrome.runtime.onInstalled.addListener(() => {
     syncStorage: false,
     theme: 'light',
     fontSize: 'medium',
-    categories: ['Work', 'Personal', 'Research', 'Ideas']
+    categories: ['General', 'Work', 'Personal', 'Research', 'Ideas']
   };
   
   chrome.storage.local.get(['settings'], (result) => {
     if (!result.settings) {
       chrome.storage.local.set({ 'settings': defaultSettings });
+    } else {
+      // Make sure 'General' category exists
+      if (!result.settings.categories.includes('General')) {
+        result.settings.categories.unshift('General');
+        chrome.storage.local.set({ 'settings': result.settings });
+      }
     }
   });
 });
@@ -23,7 +29,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     createContextMenu();
   } else if (message.action === "openPopup") {
     // Store the selection data temporarily
-    chrome.storage.local.set({ "tempSelection": message.data }, () => {
+    const storage = message.useSync ? chrome.storage.sync : chrome.storage.local;
+    storage.set({ "tempSelection": message.data }, () => {
       // Open the popup
       chrome.action.openPopup();
     });
@@ -45,7 +52,20 @@ function createContextMenu() {
 // Listen for context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "clipContent") {
-    chrome.tabs.sendMessage(tab.id, { action: "clipSelection" });
+    chrome.tabs.sendMessage(tab.id, { action: "clipSelection" }, (response) => {
+      if (response && response.success) {
+        // Store the selection data temporarily
+        chrome.storage.local.get(['settings'], (result) => {
+          const isSync = result.settings?.syncStorage || false;
+          const storage = isSync ? chrome.storage.sync : chrome.storage.local;
+          
+          storage.set({ "tempSelection": response.data }, () => {
+            // Open the popup
+            chrome.action.openPopup();
+          });
+        });
+      }
+    });
   }
 });
 
@@ -55,11 +75,16 @@ chrome.commands.onCommand.addListener((command) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]) {
         chrome.tabs.sendMessage(tabs[0].id, { action: "clipSelection" }, (response) => {
-          if (response && response.data) {
+          if (response && response.success) {
             // Store the selection data temporarily
-            chrome.storage.local.set({ "tempSelection": response.data }, () => {
-              // Open the popup
-              chrome.action.openPopup();
+            chrome.storage.local.get(['settings'], (result) => {
+              const isSync = result.settings?.syncStorage || false;
+              const storage = isSync ? chrome.storage.sync : chrome.storage.local;
+              
+              storage.set({ "tempSelection": response.data }, () => {
+                // Open the popup
+                chrome.action.openPopup();
+              });
             });
           }
         });
