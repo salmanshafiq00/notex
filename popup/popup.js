@@ -704,19 +704,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize
   initSettings();
   
-  // Reset views
+  // Reset views - Update this section
   formView.classList.add('hidden');
   savedContent.classList.add('hidden');
   settingsPanel.classList.add('hidden');
-  categoryModal.classList.add('hidden');
-  
-  // Show dashboard by default unless there's a temp selection
+  categoryModal.classList.add('hidden'); // Make sure modal is hidden
+  dashboardView.classList.remove('hidden'); // Show dashboard by default
+
+  // Load data
   getStorage().get(['tempSelection'], (result) => {
     if (result.tempSelection) {
       showForm();
     } else {
-      dashboardView.classList.remove('hidden');
-      showCategoryStats(); // This will load the category cards and recent items
+      showCategoryStats(); // Load category cards and recent items
     }
   });
   
@@ -836,6 +836,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
   cancelCategoryBtn.addEventListener('click', () => {
     categoryModal.classList.add('hidden');
+    categoryModalInput.value = '';
+    
+    // Make sure dashboard is visible
+    if (!dashboardView.classList.contains('hidden')) {
+      showCategoryStats(); // Refresh dashboard
+    }
   });
   
   exportAllBtn.addEventListener('click', exportAllItems);
@@ -856,6 +862,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('click', (e) => {
     if (e.target === categoryModal) {
       categoryModal.classList.add('hidden');
+      categoryModalInput.value = '';
     }
   });
        

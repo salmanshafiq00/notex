@@ -358,7 +358,7 @@ button:hover {
 }
 
 .hidden {
-  display: none;
+  display: none !important; /* Force hide */
 }
 
 .item-actions {
@@ -527,7 +527,6 @@ button:hover {
   align-items: center;
   justify-content: center;
 }
-
 
 .simple-modal-content {
   background-color: var(--bg-color);
