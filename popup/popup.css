@@ -648,10 +648,11 @@ body.font-large .modal-content {
 }
 
 /* Category colors */
-.category-Work { background: linear-gradient(135deg, #FF6B6B, #FF8E8E); }
-.category-Personal { background: linear-gradient(135deg, #4ECDC4, #45B7AF); }
-.category-Research { background: linear-gradient(135deg, #96C93D, #7EAF32); }
-.category-Ideas { background: linear-gradient(135deg, #A18CD1, #8675A9); }
+.category-general { background: var(--category-general); }
+.category-work { background: var(--category-work); }
+.category-personal { background: var(--category-personal); }
+.category-research { background: var(--category-research); }
+.category-ideas { background: var(--category-ideas); }
 
 .recent-items-section {
   margin-top: 24px;

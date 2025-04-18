@@ -632,34 +632,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const items = result.savedItems || [];
       const categoryStats = {};
       
-      // Calculate counts, default to 0 for all categories
+      // Initialize counts for all categories
       categories.forEach(category => {
         categoryStats[category] = 0;
       });
       
-      // Count items by category
+      // Count items
       items.forEach(item => {
         const category = item.category || 'General';
-        if (categoryStats[category] !== undefined) {
-          categoryStats[category]++;
-        } else {
-          categoryStats[category] = 1;
-        }
+        categoryStats[category] = (categoryStats[category] || 0) + 1;
       });
       
-      // Render category counts
+      // Render category cards
       categoryCounts.innerHTML = '';
-      
       categories.forEach(category => {
         const div = document.createElement('div');
-        div.className = `category-count-item category-${category}`;
+        div.className = `category-count-item category-${category.toLowerCase()}`;
         div.innerHTML = `
           <h3>${category}</h3>
           <div class="count">${categoryStats[category] || 0}</div>
         `;
-        div.addEventListener('click', () => {
-          showCategoryItems(category);
-        });
+        div.addEventListener('click', () => showCategoryItems(category));
         categoryCounts.appendChild(div);
       });
       
@@ -681,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
         div.innerHTML = `
           <div class="recent-item-title">${item.title}</div>
           <div class="recent-item-meta">
-            <span class="category-badge category-badge-${item.category}">${item.category}</span>
+            <span class="category-badge category-badge-${item.category.toLowerCase().replace(/\s+/g, '-')}">${item.category}</span>
             <span class="date">${formatDate(item.timestamp)}</span>
           </div>
         `;
@@ -711,13 +704,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize
   initSettings();
   
-  // Check if we should show the form view first (if we have temp selection)
+  // Reset views
+  formView.classList.add('hidden');
+  savedContent.classList.add('hidden');
+  settingsPanel.classList.add('hidden');
+  categoryModal.classList.add('hidden');
+  
+  // Show dashboard by default unless there's a temp selection
   getStorage().get(['tempSelection'], (result) => {
     if (result.tempSelection) {
       showForm();
     } else {
-      // Always show dashboard view initially
-      showDashboard();
+      dashboardView.classList.remove('hidden');
+      showCategoryStats(); // This will load the category cards and recent items
     }
   });
   
@@ -859,6 +858,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categoryModal.classList.add('hidden');
     }
   });
+       
   
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
