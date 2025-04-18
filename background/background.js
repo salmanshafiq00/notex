@@ -53,6 +53,10 @@ function createContextMenu() {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "clipContent") {
     chrome.tabs.sendMessage(tab.id, { action: "clipSelection" }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.log("Error: ", chrome.runtime.lastError.message);
+        return;
+      }
       if (response && response.success) {
         // Store the selection data temporarily
         chrome.storage.local.get(['settings'], (result) => {

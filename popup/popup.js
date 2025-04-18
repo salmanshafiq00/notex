@@ -669,15 +669,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       recentItems.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'recent-item';
-        div.innerHTML = `
-          <div class="recent-item-title">${item.title}</div>
-          <div class="recent-item-meta">
-            <span class="category-badge category-badge-${item.category.toLowerCase().replace(/\s+/g, '-')}">${item.category}</span>
-            <span class="date">${formatDate(item.timestamp)}</span>
-          </div>
-        `;
+        const div = renderRecentItem(item);
         div.addEventListener('click', () => {
           showItemDetails(item);
         });
@@ -700,6 +692,21 @@ document.addEventListener('DOMContentLoaded', () => {
       showForm();
     }
   });
+  
+  // Add this function to handle rendering recent items
+  function renderRecentItem(item) {
+    const div = document.createElement('div');
+    div.className = 'recent-item';
+    div.innerHTML = `
+      <div class="recent-item-title">${item.title}</div>
+      <div class="recent-item-meta">
+        <span class="category-badge category-badge-${item.category.toLowerCase()}">${item.category}</span>
+        <span class="date">${formatDate(item.timestamp)}</span>
+      </div>
+      <div class="recent-item-preview">${item.text.substring(0, 120)}${item.text.length > 120 ? '...' : ''}</div>
+    `;
+    return div;
+  }
   
   // Initialize
   initSettings();

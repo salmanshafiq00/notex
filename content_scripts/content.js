@@ -47,6 +47,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "clipSelection") {
     const result = clipSelectedContent();
     sendResponse(result);
+
+    // Always send a response
+    sendResponse({success: true, data: selectionData});
+    return true;
   }
   return true;
 });
