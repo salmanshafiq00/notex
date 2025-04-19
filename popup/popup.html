@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Content Clipper</title>
+  <title>Notex - Content Clipper</title>
   <link rel="stylesheet" href="popup.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -11,7 +11,9 @@
     <!-- Category stats and recent items view (shown initially) -->
     <div id="dashboard-view" class="dashboard-view">
       <div class="header">
-        <h1>Content Clipper</h1>
+        <h1 style="display: flex; align-items: center;">
+          <img src="../icons/icon64.png" alt="Notex" class="logo"> <span class="logo-title">Content Clipper (By Salman)</span>
+        </h1>
         <div class="settings-icon">
           <i class="fas fa-cog" id="settings-btn" title="Settings"></i>
         </div>
@@ -39,8 +41,8 @@
       </div>
 
       <div class="actions">
-        <button id="new-clip-btn" class="primary-btn">New Clip</button>
-        <button id="view-all-btn">View All</button>
+        <button id="new-clip-btn" class="primary-btn"><i class="fa-solid fa-file-pen"></i> New Clip</button>
+        <button id="view-all-btn"><i class="fa-solid fa-list"></i> View All</button>
       </div>
     </div>
     
@@ -51,7 +53,7 @@
           <button id="back-to-dashboard-btn" class="icon-btn" title="Back to Dashboard">
             <i class="fas fa-arrow-left"></i>
           </button>
-          <h1>Add New Clip</h1>
+          <h1><i class="fa-solid fa-file-pen"></i> Add New Clip</h1>
         </div>
         <div class="settings-icon">
           <i class="fas fa-cog" id="settings-btn-form" title="Settings"></i>
