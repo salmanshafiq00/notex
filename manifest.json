@@ -1,13 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Notext - Content Clipper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Save selected text with styling for later reference",
   "permissions": [
     "storage",
     "contextMenus",
-    "activeTab",
-    "downloads"
+    "activeTab"
   ],
   "action": {
     "default_popup": "popup/popup.html",
@@ -27,15 +26,18 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "http://*/*",
+        "https://*/*"
       ],
       "js": [
         "content_scripts/content.js"
-      ]
+      ],
+      "run_at": "document_end"
     }
   ],
   "background": {
-    "service_worker": "background/background.js"
+    "service_worker": "background/background.js",
+    "type": "module"
   },
   "commands": {
     "clip-selection": {
@@ -47,7 +49,8 @@
     }
   },
   "host_permissions": [
-    "<all_urls>"
+    "http://*/*",
+    "https://*/*"
   ],
   "web_accessible_resources": [
     {
@@ -55,11 +58,13 @@
         "icons/*"
       ],
       "matches": [
-        "<all_urls>"
+        "http://*/*",
+        "https://*/*"
       ]
     }
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  },
+  "minimum_chrome_version": "92"
 }
